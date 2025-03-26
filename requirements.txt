@@ -5,6 +5,7 @@ psycopg2-binary==2.9.10
 psycopg2-binary>=2.9.10
 gunicorn==23.0.0
 gunicorn>=21.2.0
+pyrebase4==4.8.0
 
 
 
