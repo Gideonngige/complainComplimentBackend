@@ -34,7 +34,6 @@ class Feedbacks(models.Model):
         ('resolved', 'resolved'),
     )
     status = models.CharField(max_length=100, choices=STATUS)
-    date
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(null=True, blank=True)
 
