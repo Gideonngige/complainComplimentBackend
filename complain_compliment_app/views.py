@@ -32,11 +32,11 @@ def index(request):
 def login(request, email, password):
     try:
         user = authe.sign_in_with_email_and_password(email,password)
-        if Members.objects.filter(email=email).exists() and user:
+        if Users.objects.filter(email=email).exists() and user:
             session_id = user['idToken']
             request.session['uid'] = str(session_id)
             return JsonResponse({"message": "Successfully logged in"})
-        elif not Members.objects.filter(email=email).exists():
+        elif not Users.objects.filter(email=email).exists():
             return JsonResponse({"message": "No user found with this email,please register"})
         elif not user:
             return JsonResponse({"message": "Invalid email"})
@@ -67,28 +67,20 @@ def register(request):
         
         # Extract data
         email = data.get("email")  # Define email first
-        chama_name = data.get("chama")
-        name = data.get("name")
-        phone_number = data.get("phone_number")
+        role = data.get("role")
         password = data.get("password")
 
         # Check if email already exists
-        if Members.objects.filter(email=email).exists():
+        if Users.objects.filter(email=email).exists():
             return JsonResponse({"message": "Email already exists"}, status=400)
 
         # Create user
         user = authe.create_user_with_email_and_password(email, password)
         uid = user['localId']
-        
-        # Check if chama exists
-        try:
-            chama = Chamas.objects.get(name=chama_name)
-        except Chamas.DoesNotExist:
-            return JsonResponse({"message": "Chama not found"}, status=400)
 
         # Save member
-        member = Members(chama=chama, name=name, email=email, phone_number=phone_number, password=uid)
-        member.save()
+        user = Users(email=email, role=role, password=uid)
+        user.save()
 
         return JsonResponse({"message": "Successfully registered"}, status=201)
 
