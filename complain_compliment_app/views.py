@@ -8,6 +8,7 @@ import pyrebase
 from django.views.decorators.csrf import csrf_exempt
 from requests.auth import HTTPBasicAuth
 import json
+from .serializers import FeedbacksSerializer
 
 
 config = {
@@ -101,4 +102,16 @@ def resetpassword(request, email):
         return JsonResponse({"message": message})
 #start of reset api
 
-
+#get feedbacks api
+@api_view(['GET'])
+def getfeedbacks(request, email):
+    try:
+        user_id = Users.objects.get(email=email)
+        if not user_id:
+            return JsonResponse({"message":"Invalid email address"})
+        feedbacks = Feedbacks.objects.get(user_id=user_id)
+        serializer = FeedbacksSerializer(feedbacks)
+        return JsonResponse(serializer.data)
+    except Feedbacks.DoesNotExist:
+        return JsonResponse({"message":"You do not have any feedbacks"})
+#end of get feedbacks api
