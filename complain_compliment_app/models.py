@@ -13,9 +13,19 @@ class Users(models.Model):
     role = models.CharField(max_length=100, choices=ROLES)
     password = models.CharField(max_length=100)
 
+    def __str__(self):
+        return (f'{self.email}, {self.role}')
+
+
+
 class Feedbacks(models.Model):
     feedback_id = models.AutoField(primary_key=True)
-    user_id = models.ForeignKey(Users, on_delete=models.CASCADE)
+    user_id = models.ForeignKey(Users, on_delete=models.CASCADE, null=True, blank=True)
+    TITLE = (
+        ('complain', 'complain'),
+        ('compliment', 'compliment'),
+    )
+    title = models.CharField(max_length=100, choices=TITLE, default="complain")
     message = models.TextField()
     CATEGORY = (
         ('academic', 'academic'),
@@ -44,5 +54,31 @@ class Feedbacks(models.Model):
                 from django.utils.timezone import now
                 self.updated_at = now()
         super().save(*args, **kwargs)
+    
+    def __str__(self):
+        return (f'{self.user_id}, {self.category}, {self.status}')
+
+
+class AdminResponse(models.Model):
+    response_id = models.AutoField(primary_key=True)
+    admin_id = models.ForeignKey(Users, on_delete=models.CASCADE)
+    feedback_id = models.ForeignKey(Feedbacks, on_delete=models.CASCADE)
+    message = models.TextField()
+    response_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return (f'{self.admin_id}, {self.user_id}, {self.response_date}')
+
+class Report(models.Model):
+    report_id = models.AutoField(primary_key=True)
+    month = models.CharField(max_length=100)
+    total_complaints = models.IntegerField()
+    total_compliments = models.IntegerField()
+    total_feedbacks = models.IntegerField()
+    report_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return (f'{self.month}, {self.report_date}')
+
 
 
