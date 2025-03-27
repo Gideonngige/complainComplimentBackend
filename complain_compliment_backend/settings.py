@@ -104,6 +104,7 @@ CORS_ALLOW_ALL_ORIGINS = True
 CORS_ORIGIN_WHITELIST = (
 'http://localhost:8081',
 'http://localhost:8000',
+'https://complaincomplimentbackend.onrender.com'
 )
 
 
