@@ -9,7 +9,6 @@ from django.views.decorators.csrf import csrf_exempt
 from requests.auth import HTTPBasicAuth
 import json
 from .serializers import FeedbacksSerializer
-from datetime import datetime
 
 
 config = {
@@ -119,7 +118,7 @@ def getfeedbacks(request, email):
 
 
 #start of feedbacks api 
-@api_view(['POST'])
+@api_view(['GET'])
 def feedbacks(request):
     try:
         data = json.loads(request.body)
@@ -127,23 +126,21 @@ def feedbacks(request):
         title = data.get('title')
         category = data.get('category')
         message = data.get('message')
-        anonymous = data.get('anonymous')
        
         user = Users.objects.get(email=email)
+        print(user.user_id)
+        # return JsonResponse({"message":user.user_id})
+        if anonymous == "true":
+            user1 = None
+        elif anonymous == "false":
+            user1 = Users.objects.get(email=email)
         if user:
-            now = datetime.now()
-            if anonymous == "true":
-                feedback = Feedbacks(title=title, category=category,message=message, status="pending", updated_at=now)
-                feedback.save()
-
-            elif anonymous == "false":
-                feedback = Feedbacks(user_id=user, title=title, category=category,message=message, status="pending", updated_at=now)
-                feedback.save()
-                
+            feedback = Feedbacks(user_id=user1, title=title, category=category,message=message, status="pending")
+            feedback.save()
             return JsonResponse({"message":"Feedback was successfully submitted","status":200})
         else:
             return JsonResponse({"message":"Please signin"})
 
     except Users.DoesNotExist:
-        return JsonResponse({"message":"Invalid email address"})
+        return Response({"message":"Invalid email address"})
 #end of feedbacks api
