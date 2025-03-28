@@ -131,7 +131,7 @@ def feedbacks(request):
         anonymous = data.get('anonymous')
 
         try:
-            user = Users.objects.filter(email=email)
+            user = Users.objects.get(email=email)
         except Users.DoesNotExist:
             return JsonResponse({"message": "Invalid email address"}, status=400)
 
