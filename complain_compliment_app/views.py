@@ -119,11 +119,6 @@ def getfeedbacks(request, email):
 
 
 #start of feedbacks api 
-import json
-from datetime import datetime
-from django.http import JsonResponse
-from rest_framework.decorators import api_view
-from .models import Users, Feedbacks  # Ensure correct import
 
 @api_view(['POST'])
 def feedbacks(request):
@@ -136,7 +131,7 @@ def feedbacks(request):
         anonymous = data.get('anonymous')
 
         try:
-            user = Users.objects.get(email=email)
+            user = Users.objects.filter(email=email)
         except Users.DoesNotExist:
             return JsonResponse({"message": "Invalid email address"}, status=400)
 
