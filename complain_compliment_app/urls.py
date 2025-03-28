@@ -9,4 +9,5 @@ urlpatterns = [
     path('resetpassword/', views.resetpassword, name='resetpassword'),
     path('getfeedbacks/<str:email>/', views.getfeedbacks, name='getfeedbacks'),
     path('feedbacks/', views.feedbacks, name='feedbacks'),
+    path('getadminfeedbacks/', views.getadminfeedbacks, name='getadminfeedbacks'),
 ]

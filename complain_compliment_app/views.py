@@ -109,9 +109,9 @@ def getfeedbacks(request, email):
         user_id = Users.objects.get(email=email)
         if not user_id:
             return JsonResponse({"message":"Invalid email address"})
-        feedbacks = Feedbacks.objects.get(user_id=user_id)
-        serializer = FeedbacksSerializer(feedbacks)
-        return JsonResponse(serializer.data)
+        feedbacks = Feedbacks.objects.filter(user_id=user_id)
+        serializer = FeedbacksSerializer(feedbacks, many=True)
+        return JsonResponse(serializer.data, safe=False)
     except Feedbacks.DoesNotExist:
         return JsonResponse({"message":"You do not have any feedbacks"})
 #end of get feedbacks api
@@ -143,3 +143,10 @@ def feedbacks(request):
     except Users.DoesNotExist:
         return Response({"message":"Invalid email address"})
 #end of feedbacks api
+
+# start of get feedacks for admin api
+def getadminfeedbacks(request):
+    feedbacks = Feedbacks.objects.filter(status__in=["pending", "on-progress"])
+    serializer = FeedbacksSerializer(feedbacks, many=True)
+    return JsonResponse(serializer.data, safe=False)
+# end of get feedbacks for admin api
