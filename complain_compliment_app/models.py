@@ -26,7 +26,6 @@ class Feedbacks(models.Model):
         ('compliment', 'compliment'),
     )
     title = models.CharField(max_length=100, choices=TITLE, default="complain")
-    message = models.TextField()
     CATEGORY = (
         ('academic', 'academic'),
         ('finance', 'finance'),
@@ -38,6 +37,7 @@ class Feedbacks(models.Model):
         ('complaint', 'complaint'),
     )
     category = models.CharField(max_length=100, choices=CATEGORY)
+    message = models.TextField()
     STATUS = (
         ('pending', 'pending'),
         ('on-progress', 'on-progress'),

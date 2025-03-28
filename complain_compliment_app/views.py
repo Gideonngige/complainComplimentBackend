@@ -9,6 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 from requests.auth import HTTPBasicAuth
 import json
 from .serializers import FeedbacksSerializer
+from datetime import datetime
 
 
 config = {
@@ -115,3 +116,35 @@ def getfeedbacks(request, email):
     except Feedbacks.DoesNotExist:
         return JsonResponse({"message":"You do not have any feedbacks"})
 #end of get feedbacks api
+
+
+#start of feedbacks api 
+@api_view(['POST'])
+def feedbacks(request):
+    try:
+        data = json.loads(request.body)
+        email = data.get('email') 
+        title = data.get('title')
+        category = data.get('category')
+        message = data.get('message')
+        anonymous = data.get('anonymous')
+       
+        user = Users.objects.get(email=email)
+        if user:
+            now = datetime.now()
+            if anonymous == "true" or anonymous == "True":
+                feedback = Feedbacks(title=title, category=category,message=message, status="pending", updated_at=now)
+                feedback.save()
+                return JsonResponse({"message":"Feedback was successfully submitted","status":200})
+            elif anonymous == "false" or anonymous == "False":
+                feedback.save()
+                feedback = Feedbacks(user_id=user, title=title, category=category,message=message, status="pending")
+                feedback.save()
+            
+                return JsonResponse({"message":"Feedback was successfully submitted","status":200})
+        else:
+            return JsonResponse({"message":"Please signin"})
+
+    except Users.DoesNotExist:
+        return Response({"message":"Invalid email address"})
+#end of feedbacks api
