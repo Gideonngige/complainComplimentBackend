@@ -137,7 +137,7 @@ def feedbacks(request):
                 feedback.save()
 
             elif anonymous == "false":
-                feedback = Feedbacks(user_id=user.user_id, title=title, category=category,message=message, status="pending", updated_at=now)
+                feedback = Feedbacks(user_id=user, title=title, category=category,message=message, status="pending", updated_at=now)
                 feedback.save()
                 
             return JsonResponse({"message":"Feedback was successfully submitted","status":200})
