@@ -131,7 +131,7 @@ def feedbacks(request):
         user = Users.objects.get(email=email)
         print(user.user_id)
         # return JsonResponse({"message":user.user_id})
-        if user and anonymous:
+        if user and not anonymous:
             feedback = Feedbacks(user_id=user, title=title, category=category,message=message, status="pending")
             feedback.save()
             return JsonResponse({"message":"Feedback was successfully submitted","status":200})
