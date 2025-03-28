@@ -118,7 +118,7 @@ def getfeedbacks(request, email):
 
 
 #start of feedbacks api 
-@api_view(['GET'])
+@api_view(['POST'])
 def feedbacks(request):
     try:
         data = json.loads(request.body)
