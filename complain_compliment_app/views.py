@@ -119,6 +119,12 @@ def getfeedbacks(request, email):
 
 
 #start of feedbacks api 
+import json
+from datetime import datetime
+from django.http import JsonResponse
+from rest_framework.decorators import api_view
+from .models import Users, Feedbacks  # Ensure correct import
+
 @api_view(['POST'])
 def feedbacks(request):
     try:
@@ -128,23 +134,26 @@ def feedbacks(request):
         category = data.get('category')
         message = data.get('message')
         anonymous = data.get('anonymous')
-       
-        user = Users.objects.get(email=email)
-        if user:
-            now = datetime.now()
-            if anonymous == "true" or anonymous == "True":
-                feedback = Feedbacks(title=title, category=category,message=message, status="pending", updated_at=now)
-                feedback.save()
-                return JsonResponse({"message":"Feedback was successfully submitted","status":200})
-            elif anonymous == "false" or anonymous == "False":
-                feedback.save()
-                feedback = Feedbacks(user_id=user, title=title, category=category,message=message, status="pending")
-                feedback.save()
-            
-                return JsonResponse({"message":"Feedback was successfully submitted","status":200})
-        else:
-            return JsonResponse({"message":"Please signin"})
 
-    except Users.DoesNotExist:
-        return Response({"message":"Invalid email address"})
+        try:
+            user = Users.objects.get(email=email)
+        except Users.DoesNotExist:
+            return JsonResponse({"message": "Invalid email address"}, status=400)
+
+        now = datetime.now()
+
+        if anonymous in ["true", "True"]:
+            feedback = Feedbacks(title=title, category=category, message=message, status="pending", updated_at=now)
+        else:
+            feedback = Feedbacks(user_id=user, title=title, category=category, message=message, status="pending", updated_at=now)
+
+        feedback.save()
+        return JsonResponse({"message": "Feedback was successfully submitted"}, status=200)
+
+    except json.JSONDecodeError:
+        return JsonResponse({"message": "Invalid JSON input"}, status=400)
+    
+    except Exception as e:
+        return JsonResponse({"message": f"An error occurred: {str(e)}"}, status=500)
+
 #end of feedbacks api
