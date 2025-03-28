@@ -132,12 +132,12 @@ def feedbacks(request):
         user = Users.objects.get(email=email)
         if user:
             now = datetime.now()
-            if anonymous == "true" or anonymous == "True":
+            if anonymous == "true":
                 feedback = Feedbacks(title=title, category=category,message=message, status="pending", updated_at=now)
                 feedback.save()
                 return JsonResponse({"message":"Feedback was successfully submitted","status":200})
-            elif anonymous == "false" or anonymous == "False":
-                feedback.save()
+
+            elif anonymous == "false":
                 feedback = Feedbacks(user_id=user.user_id, title=title, category=category,message=message, status="pending")
                 feedback.save()
                 return JsonResponse({"message":"Feedback was successfully submitted","status":200})
