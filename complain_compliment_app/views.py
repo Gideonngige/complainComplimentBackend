@@ -119,7 +119,6 @@ def getfeedbacks(request, email):
 
 
 #start of feedbacks api 
-
 @api_view(['POST'])
 def feedbacks(request):
     try:
@@ -129,26 +128,22 @@ def feedbacks(request):
         category = data.get('category')
         message = data.get('message')
         anonymous = data.get('anonymous')
-
-        try:
-            user = Users.objects.get(email=email)
-        except Users.DoesNotExist:
-            return JsonResponse({"message": "Invalid email address"}, status=400)
-
-        now = datetime.now()
-
-        if anonymous in ["true", "True"]:
-            feedback = Feedbacks(title=title, category=category, message=message, status="pending", updated_at=now)
+       
+        user = Users.objects.get(email=email)
+        if user:
+            now = datetime.now()
+            if anonymous == "true" or anonymous == "True":
+                feedback = Feedbacks(title=title, category=category,message=message, status="pending", updated_at=now)
+                feedback.save()
+                return JsonResponse({"message":"Feedback was successfully submitted","status":200})
+            elif anonymous == "false" or anonymous == "False":
+                feedback.save()
+                feedback = Feedbacks(user_id=user.user_id, title=title, category=category,message=message, status="pending")
+                feedback.save()
+                return JsonResponse({"message":"Feedback was successfully submitted","status":200})
         else:
-            feedback = Feedbacks(user_id=user, title=title, category=category, message=message, status="pending", updated_at=now)
+            return JsonResponse({"message":"Please signin"})
 
-        feedback.save()
-        return JsonResponse({"message": "Feedback was successfully submitted"}, status=200)
-
-    except json.JSONDecodeError:
-        return JsonResponse({"message": "Invalid JSON input"}, status=400)
-    
-    except Exception as e:
-        return JsonResponse({"message": f"An error occurred: {str(e)}"}, status=500)
-
+    except Users.DoesNotExist:
+        return JsonResponse({"message":"Invalid email address"})
 #end of feedbacks api
