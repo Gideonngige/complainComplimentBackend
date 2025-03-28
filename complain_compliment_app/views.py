@@ -131,16 +131,14 @@ def feedbacks(request):
         user = Users.objects.get(email=email)
         print(user.user_id)
         # return JsonResponse({"message":user.user_id})
-        if anonymous == "true":
-            user1 = None
-        elif anonymous == "false":
-            user1 = Users.objects.get(email=email)
-        if user:
-            feedback = Feedbacks(user_id=user1, title=title, category=category,message=message, status="pending")
+        if user and anonymous:
+            feedback = Feedbacks(user_id=user, title=title, category=category,message=message, status="pending")
             feedback.save()
             return JsonResponse({"message":"Feedback was successfully submitted","status":200})
         else:
-            return JsonResponse({"message":"Please signin"})
+            feedback = Feedbacks(title=title, category=category,message=message, status="pending")
+            feedback.save()
+            return JsonResponse({"message":"Feedback was successfully submitted","status":200})
 
     except Users.DoesNotExist:
         return Response({"message":"Invalid email address"})
