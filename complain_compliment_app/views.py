@@ -126,6 +126,7 @@ def feedbacks(request):
         title = data.get('title')
         category = data.get('category')
         message = data.get('message')
+        anonymous = data.get('anonymous')
        
         user = Users.objects.get(email=email)
         print(user.user_id)

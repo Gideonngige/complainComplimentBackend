@@ -8,5 +8,5 @@ urlpatterns = [
     path('logout/', views.logout, name='logout'),
     path('resetpassword/', views.resetpassword, name='resetpassword'),
     path('getfeedbacks/<str:email>/', views.getfeedbacks, name='getfeedbacks'),
-    path('feedbacks/<str:email>/<str:title>/<str:category>/<str:message>/<str:anonymous>/', views.feedbacks, name='feedbacks'),
+    path('feedbacks/', views.feedbacks, name='feedbacks'),
 ]
