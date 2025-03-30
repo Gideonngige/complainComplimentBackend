@@ -10,4 +10,5 @@ urlpatterns = [
     path('getfeedbacks/<str:email>/', views.getfeedbacks, name='getfeedbacks'),
     path('feedbacks/', views.feedbacks, name='feedbacks'),
     path('getadminfeedbacks/', views.getadminfeedbacks, name='getadminfeedbacks'),
+    path('adminresponse/', views.adminresponse, name='adminresponse'),
 ]

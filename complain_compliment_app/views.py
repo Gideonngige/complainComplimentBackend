@@ -151,3 +151,33 @@ def getadminfeedbacks(request):
     serializer = FeedbacksSerializer(feedbacks, many=True)
     return JsonResponse(serializer.data, safe=False)
 # end of get feedbacks for admin api
+
+# start of admin response api
+
+@api_view(['POST'])
+def adminresponse(request):
+    try:
+        data = json.loads(request.body)
+        email = data.get('email')
+        feedback_id = data.get('feedback_id')
+        message = data.get('message')
+        a_response = data.get('response')
+        status = data.get('status')
+
+        if not Users.objects.filter(email=email).exists():
+            return JsonResponse({"message":"Invalid email address"})
+
+        admin_id = Users.objects.get(email=email)
+        feedback = Feedbacks.objects.get(feedback_id=feedback_id)
+        admin_response = AdminResponse(admin_id=admin_id, feedback_id=feedback, message=message, response=a_response)
+        admin_response.save()
+        feedback.status = status
+        feedback.updated_at = admin_response.response_date
+        feedback.save()
+        return JsonResponse({"message":"Response was successfully submitted","status":200})
+
+    except Feedbacks.DoesNotExist:
+        return JsonResponse({"message":"Feedback with this id does not exist"})
+    except AdminResponse.DoesNotExist:
+        return JsonResponse({"message":"Admin response with this id does not exist"})
+# end of admin response api

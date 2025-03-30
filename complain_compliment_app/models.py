@@ -47,27 +47,17 @@ class Feedbacks(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(null=True, blank=True)
 
-    def save(self, *args, **kwargs):
-        if self.pk:
-            original = Feedbacks.objects.get(pk=self.pk)
-            if original.status != self.status:
-                from django.utils.timezone import now
-                self.updated_at = now()
-        super().save(*args, **kwargs)
-    
-    def __str__(self):
-        return (f'{self.user_id}, {self.category}, {self.status}')
-
 
 class AdminResponse(models.Model):
     response_id = models.AutoField(primary_key=True)
     admin_id = models.ForeignKey(Users, on_delete=models.CASCADE)
     feedback_id = models.ForeignKey(Feedbacks, on_delete=models.CASCADE)
     message = models.TextField()
+    response = models.TextField(default="")
     response_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return (f'{self.admin_id}, {self.user_id}, {self.response_date}')
+        return (f'{self.admin_id}, {self.feedback_id}, {self.response_date}')
 
 class Report(models.Model):
     report_id = models.AutoField(primary_key=True)
