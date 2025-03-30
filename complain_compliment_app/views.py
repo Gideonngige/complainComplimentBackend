@@ -103,13 +103,14 @@ def resetpassword(request, email):
 #start of reset api
 
 #get feedbacks api
+from django.db.models import Q
 @api_view(['GET'])
 def getfeedbacks(request, email):
     try:
         user_id = Users.objects.get(email=email)
         if not user_id:
             return JsonResponse({"message":"Invalid email address"})
-        feedbacks = Feedbacks.objects.filter(user_id=user_id)
+        feedbacks = Feedbacks.objects.filter(Q(user_id=user_id) | Q(user_id__isnull=True))
         serializer = FeedbacksSerializer(feedbacks, many=True)
         return JsonResponse(serializer.data, safe=False)
     except Feedbacks.DoesNotExist:
