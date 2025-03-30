@@ -8,7 +8,7 @@ import pyrebase
 from django.views.decorators.csrf import csrf_exempt
 from requests.auth import HTTPBasicAuth
 import json
-from .serializers import FeedbacksSerializer
+from .serializers import FeedbacksSerializer, AdminResponseSerializer
 
 
 config = {
@@ -181,3 +181,32 @@ def adminresponse(request):
     except AdminResponse.DoesNotExist:
         return JsonResponse({"message":"Admin response with this id does not exist"})
 # end of admin response api
+# user = Users.objects.get(email=email)
+#         print(user.user_id)
+# start of notification api
+@api_view(['GET'])
+def notification(request, email):
+    try:
+        # Get the logged-in user
+        user = Users.objects.get(email=email) 
+
+        # Get all feedbacks for this user
+        feedback_ids = list(Feedbacks.objects.filter(user_id=user).values_list('feedback_id', flat=True))
+        print(feedback_ids)
+
+        if not feedback_ids:
+            return Response({"message": "No feedbacks found"}, status=404)
+
+        # Get all admin responses related to the user's feedbacks
+        responses = AdminResponse.objects.filter(feedback_id__in=feedback_ids).order_by('-response_date')
+
+        if not responses.exists():
+            return Response({"message": "No responses found"}, status=404)
+
+        # Serialize and return the responses
+        serializer = AdminResponseSerializer(responses, many=True)
+        return Response(serializer.data)
+
+    except Exception as e:
+        return Response({"message": f"An error occurred: {str(e)}"}, status=500)
+#end of notification api
