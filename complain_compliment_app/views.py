@@ -9,6 +9,8 @@ from django.views.decorators.csrf import csrf_exempt
 from requests.auth import HTTPBasicAuth
 import json
 from .serializers import FeedbacksSerializer, AdminResponseSerializer
+import hashlib
+from django.db.models import Q
 
 
 config = {
@@ -102,15 +104,22 @@ def resetpassword(request, email):
         return JsonResponse({"message": message})
 #start of reset api
 
+# email hash function 
+def hash_email(email):
+    hash_object = hashlib.sha256(email.encode())
+    hex_dig = hash_object.hexdigest()
+    return hex_dig
+# end of email hash function
+
 #get feedbacks api
-from django.db.models import Q
 @api_view(['GET'])
 def getfeedbacks(request, email):
     try:
         user_id = Users.objects.get(email=email)
+        email_hash = hash_email(email)
         if not user_id:
             return JsonResponse({"message":"Invalid email address"})
-        feedbacks = Feedbacks.objects.filter(Q(user_id=user_id) | Q(user_id__isnull=True))
+        feedbacks = Feedbacks.objects.filter(Q(user_id=user_id) | Q(email_hash=email_hash))
         serializer = FeedbacksSerializer(feedbacks, many=True)
         return JsonResponse(serializer.data, safe=False)
     except Feedbacks.DoesNotExist:
@@ -131,13 +140,14 @@ def feedbacks(request):
        
         user = Users.objects.get(email=email)
         print(user.user_id)
-        # return JsonResponse({"message":user.user_id})
+        email_hash = hash_email(email)
+        
         if user and not anonymous:
-            feedback = Feedbacks(user_id=user, title=title, category=category,message=message, status="pending")
+            feedback = Feedbacks(user_id=user, email_hash=email_hash, title=title, category=category,message=message, status="pending")
             feedback.save()
             return JsonResponse({"message":"Feedback was successfully submitted","status":200})
         else:
-            feedback = Feedbacks(title=title, category=category,message=message, status="pending")
+            feedback = Feedbacks(email_hash=email_hash, title=title, category=category,message=message, status="pending")
             feedback.save()
             return JsonResponse({"message":"Feedback was successfully submitted","status":200})
 

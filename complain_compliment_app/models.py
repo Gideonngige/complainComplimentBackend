@@ -21,6 +21,7 @@ class Users(models.Model):
 class Feedbacks(models.Model):
     feedback_id = models.AutoField(primary_key=True)
     user_id = models.ForeignKey(Users, on_delete=models.CASCADE, null=True, blank=True)
+    email_hash = models.CharField(max_length=64, blank=True, null=True)
     TITLE = (
         ('complain', 'complain'),
         ('compliment', 'compliment'),
