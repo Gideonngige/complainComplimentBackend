@@ -11,6 +11,7 @@ import json
 from .serializers import FeedbacksSerializer, AdminResponseSerializer
 import hashlib
 from django.db.models import Q
+from django.db.models import Sum
 
 
 config = {
@@ -220,3 +221,13 @@ def notification(request, email):
     except Exception as e:
         return Response({"message": f"An error occurred: {str(e)}"}, status=500)
 #end of notification api
+
+# start of get_receive_resolved api
+@api_view(['GET'])
+def countreceivedresolved(request):
+    received = Feedbacks.objects.filter(status__in=["pending", "on-progress", "solved"]).count()
+    resolved = Feedbacks.objects.filter(status__in=["solved"]).count()
+    return Response({'received': received, "resolved": resolved})
+
+# end of get_receive_resolved api
+
