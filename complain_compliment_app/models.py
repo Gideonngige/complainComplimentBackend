@@ -65,6 +65,7 @@ class Report(models.Model):
     month = models.CharField(max_length=100)
     total_complaints = models.IntegerField()
     total_compliments = models.IntegerField()
+    total_resolved = models.IntegerField(default=0)
     total_feedbacks = models.IntegerField()
     report_date = models.DateTimeField(auto_now_add=True)
 

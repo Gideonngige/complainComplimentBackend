@@ -8,10 +8,11 @@ import pyrebase
 from django.views.decorators.csrf import csrf_exempt
 from requests.auth import HTTPBasicAuth
 import json
-from .serializers import FeedbacksSerializer, AdminResponseSerializer
+from .serializers import FeedbacksSerializer, AdminResponseSerializer, ReportSerializer
 import hashlib
 from django.db.models import Q
 from django.db.models import Sum
+from django.utils.timezone import now
 
 
 config = {
@@ -192,8 +193,7 @@ def adminresponse(request):
     except AdminResponse.DoesNotExist:
         return JsonResponse({"message":"Admin response with this id does not exist"})
 # end of admin response api
-# user = Users.objects.get(email=email)
-#         print(user.user_id)
+
 # start of notification api
 @api_view(['GET'])
 def notification(request, email):
@@ -225,9 +225,34 @@ def notification(request, email):
 # start of get_receive_resolved api
 @api_view(['GET'])
 def countreceivedresolved(request):
-    received = Feedbacks.objects.filter(status__in=["pending", "on-progress", "solved"]).count()
-    resolved = Feedbacks.objects.filter(status__in=["solved"]).count()
+    received = Feedbacks.objects.filter(status__in=["pending", "on-progress", "resolved"]).count()
+    resolved = Feedbacks.objects.filter(status__in=["resolved"]).count()
     return Response({'received': received, "resolved": resolved})
 
 # end of get_receive_resolved api
 
+# start of report api
+def report():
+    current_month = now().strftime("%B")
+    print(current_month)
+    complains = resolved = Feedbacks.objects.filter(title__in=["complain"]).count()
+    compliments = resolved = Feedbacks.objects.filter(title__in=["compliment"]).count()
+    received = Feedbacks.objects.filter(status__in=["pending", "on-progress", "resolved"]).count()
+    resolved = Feedbacks.objects.filter(status__in=["resolved"]).count()
+    report = Report(month=current_month, total_complaints=complains, total_compliments=compliments, total_resolved=resolved, total_feedbacks=received)
+    report.save()
+# end of report api
+
+#start of get report
+@api_view(['GET'])
+def getreport(request):
+    current_month = now().strftime("%B")
+    reports = Report.objects.filter(month=current_month)
+    if not reports:
+        report()
+        serializer = ReportSerializer(reports, many=True)
+    else:
+        serializer = ReportSerializer(reports, many=True)
+    
+    return Response(serializer.data)
+# end of get report

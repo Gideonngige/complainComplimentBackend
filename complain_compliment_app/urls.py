@@ -13,4 +13,5 @@ urlpatterns = [
     path('adminresponse/', views.adminresponse, name='adminresponse'),
     path('notification/<str:email>/', views.notification, name='notification'),
     path('countreceivedresolved/', views.countreceivedresolved, name='countreceivedresolved'),
+    path('getreport/', views.getreport, name='getreport'),
 ]
