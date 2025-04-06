@@ -121,7 +121,7 @@ def getfeedbacks(request, email):
         email_hash = hash_email(email)
         if not user_id:
             return JsonResponse({"message":"Invalid email address"})
-        feedbacks = Feedbacks.objects.filter(Q(user_id=user_id) | Q(email_hash=email_hash))
+        feedbacks = Feedbacks.objects.filter(Q(user_id=user_id) | Q(email_hash=email_hash)).order_by('-created_at')
         serializer = FeedbacksSerializer(feedbacks, many=True)
         return JsonResponse(serializer.data, safe=False)
     except Feedbacks.DoesNotExist:
