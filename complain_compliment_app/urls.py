@@ -9,9 +9,10 @@ urlpatterns = [
     path('resetpassword/<str:email>/', views.resetpassword, name='resetpassword'),
     path('getfeedbacks/<str:email>/', views.getfeedbacks, name='getfeedbacks'),
     path('feedbacks/', views.feedbacks, name='feedbacks'),
-    path('getadminfeedbacks/', views.getadminfeedbacks, name='getadminfeedbacks'),
+    path('getadminfeedbacks/<str:department>/', views.getadminfeedbacks, name='getadminfeedbacks'),
     path('adminresponse/', views.adminresponse, name='adminresponse'),
     path('notification/<str:email>/', views.notification, name='notification'),
     path('countreceivedresolved/', views.countreceivedresolved, name='countreceivedresolved'),
     path('getreport/', views.getreport, name='getreport'),
+     path('getuser/<str:email>/', views.getuser, name='getuser'),
 ]

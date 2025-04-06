@@ -8,7 +8,7 @@ import pyrebase
 from django.views.decorators.csrf import csrf_exempt
 from requests.auth import HTTPBasicAuth
 import json
-from .serializers import FeedbacksSerializer, AdminResponseSerializer, ReportSerializer
+from .serializers import FeedbacksSerializer, AdminResponseSerializer, ReportSerializer, UsersSerializer
 import hashlib
 from django.db.models import Q
 from django.db.models import Sum
@@ -158,8 +158,9 @@ def feedbacks(request):
 #end of feedbacks api
 
 # start of get feedacks for admin api
-def getadminfeedbacks(request):
-    feedbacks = Feedbacks.objects.filter(status__in=["pending", "on-progress"])
+def getadminfeedbacks(request, department):
+    print(department)
+    feedbacks = Feedbacks.objects.filter(status__in=["pending", "on-progress"], category=department).order_by('-created_at')
     serializer = FeedbacksSerializer(feedbacks, many=True)
     return JsonResponse(serializer.data, safe=False)
 # end of get feedbacks for admin api
@@ -225,9 +226,27 @@ def notification(request, email):
 # start of get_receive_resolved api
 @api_view(['GET'])
 def countreceivedresolved(request):
-    received = Feedbacks.objects.filter(status__in=["pending", "on-progress", "resolved"]).count()
-    resolved = Feedbacks.objects.filter(status__in=["resolved"]).count()
-    return Response({'received': received, "resolved": resolved})
+    academic_received = Feedbacks.objects.filter(status__in=["pending", "on-progress", "resolved"],category="academic").count()
+    academic_resolved = Feedbacks.objects.filter(status__in=["resolved"], category="academic").count()
+    administration_received = Feedbacks.objects.filter(status__in=["pending", "on-progress", "resolved"],category="administration and support").count()
+    administration_resolved = Feedbacks.objects.filter(status__in=["resolved"], category="administration and support").count()
+    health_received = Feedbacks.objects.filter(status__in=["pending", "on-progress", "resolved"],category="health and wellness").count()
+    health_resolved = Feedbacks.objects.filter(status__in=["resolved"], category="health and wellness").count()
+    ict_received = Feedbacks.objects.filter(status__in=["pending", "on-progress", "resolved"],category="ict and communication").count()
+    ict_resolved = Feedbacks.objects.filter(status__in=["resolved"], category="ict and communication").count()
+    student_received = Feedbacks.objects.filter(status__in=["pending", "on-progress", "resolved"],category="student services").count()
+    student_resolved = Feedbacks.objects.filter(status__in=["resolved"], category="student services").count()
+    maintenance_received = Feedbacks.objects.filter(status__in=["pending", "on-progress", "resolved"],category="maintenance and environment").count()
+    maintenance_resolved = Feedbacks.objects.filter(status__in=["resolved"], category="maintenance and environment").count()
+    return Response(
+        {
+            'academic_received': academic_received, "academic_resolved": academic_resolved,
+            'administration_received': administration_received, "administration_resolved": administration_resolved,
+            'health_received': health_received, "health_resolved": health_resolved,
+            'ict_received': ict_received, "ict_resolved": ict_resolved,
+            'student_received': student_received, "student_resolved": student_resolved,
+            'maintenance_received': maintenance_received, "maintenance_resolved": maintenance_resolved,
+            })
 
 # end of get_receive_resolved api
 
@@ -235,8 +254,8 @@ def countreceivedresolved(request):
 def report():
     current_month = now().strftime("%B")
     print(current_month)
-    complains = resolved = Feedbacks.objects.filter(title__in=["complain"]).count()
-    compliments = resolved = Feedbacks.objects.filter(title__in=["compliment"]).count()
+    complains = Feedbacks.objects.filter(title__in=["complain"]).count()
+    compliments = Feedbacks.objects.filter(title__in=["compliment"]).count()
     received = Feedbacks.objects.filter(status__in=["pending", "on-progress", "resolved"]).count()
     resolved = Feedbacks.objects.filter(status__in=["resolved"]).count()
     report = Report(month=current_month, total_complaints=complains, total_compliments=compliments, total_resolved=resolved, total_feedbacks=received)
@@ -256,3 +275,16 @@ def getreport(request):
     
     return Response(serializer.data)
 # end of get report
+
+# start get user api 
+@api_view(['GET'])
+def getuser(request, email):
+    try:
+        user = Users.objects.get(email=email)
+        serializer = UsersSerializer(user, many=False)
+        return JsonResponse(serializer.data, safe=False)
+    except Users.DoesNotExist:
+        return JsonResponse({"message":"User not found"}, status=404)
+    except Exception as e:
+        return JsonResponse({"message":"Something went wrong"}, status=500)
+# end of get user api

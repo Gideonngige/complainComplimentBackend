@@ -11,10 +11,19 @@ class Users(models.Model):
         ('student', 'student'),
     )
     role = models.CharField(max_length=100, choices=ROLES)
+    DEPARTMENT = (
+        ('academic', 'academic'),
+        ('health and wellness', 'health and wellness'),
+        ('administration and support', 'administration and support'),
+        ('ict and communication', 'ict and communication'),
+        ('student services', 'student services'),
+        ('maintenance and environment', 'maintenance and environment'),
+    )
+    department = models.CharField(max_length=100,  choices=DEPARTMENT, blank=True, null=True)
     password = models.CharField(max_length=100)
 
     def __str__(self):
-        return (f'{self.email}, {self.role}')
+        return (f'{self.email}, {self.role},{self.user_id}')
 
 
 
@@ -29,13 +38,11 @@ class Feedbacks(models.Model):
     title = models.CharField(max_length=100, choices=TITLE, default="complain")
     CATEGORY = (
         ('academic', 'academic'),
-        ('finance', 'finance'),
-        ('hostel', 'hostel'),
-        ('library', 'library'),
-        ('medical', 'medical'),
-        ('security', 'security'),
-        ('transport', 'transport'),
-        ('complaint', 'complaint'),
+        ('health and wellness', 'health and wellness'),
+        ('administration and support', 'administration and support'),
+        ('ict and communication', 'ict and communication'),
+        ('student services', 'student services'),
+        ('maintenance and environment', 'maintenance and environment'),
     )
     category = models.CharField(max_length=100, choices=CATEGORY)
     message = models.TextField()
