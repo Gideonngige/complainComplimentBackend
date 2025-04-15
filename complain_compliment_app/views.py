@@ -203,7 +203,7 @@ def notification(request, email):
         user = Users.objects.get(email=email) 
 
         # Get all feedbacks for this user
-        feedback_ids = list(Feedbacks.objects.filter(user_id=user).values_list('feedback_id', flat=True))
+        feedback_ids = list(Feedbacks.objects.filter(user_id=user, status="resolved").values_list('feedback_id', flat=True))
         print(feedback_ids)
 
         if not feedback_ids:
@@ -288,3 +288,23 @@ def getuser(request, email):
     except Exception as e:
         return JsonResponse({"message":"Something went wrong"}, status=500)
 # end of get user api
+
+# start of count each department feedbacks
+@api_view(['GET'])
+def countdepartmentfeedbacks(request):
+    academic_complains = Feedbacks.objects.filter(title__in=["complain"], category="academic").count()
+    academic_compliments = Feedbacks.objects.filter(title__in=["compliment"], category="academic").count()
+    health_complains = Feedbacks.objects.filter(title__in=["complain"], category="health and wellness").count()
+    health_compliments = Feedbacks.objects.filter(title__in=["compliment"], category="health and wellness").count()
+    admin_complains = Feedbacks.objects.filter(title__in=["complain"], category="administration and support").count()
+    admin_compliments = Feedbacks.objects.filter(title__in=["compliment"], category="administration and support").count()
+    ict_complains = Feedbacks.objects.filter(title__in=["complain"], category="ict and communication").count()
+    ict_compliments = Feedbacks.objects.filter(title__in=["compliment"], category="ict and communication").count()
+    student_complains = Feedbacks.objects.filter(title__in=["complain"], category="student services").count()
+    student_compliments = Feedbacks.objects.filter(title__in=["compliment"], category="student services").count()
+    maintenance_complains = Feedbacks.objects.filter(title__in=["complain"], category="maintenance and environment").count()
+    maintenance_compliments = Feedbacks.objects.filter(title__in=["compliment"], category="maintenance and environment").count()
+
+    return Response({"total_acc":academic_complains,"total_ac":academic_compliments, "total_hc":health_complains, "total_h":health_compliments, "total_adc":admin_complains, "total_ad":admin_compliments, "total_ic":ict_complains,"total_i":ict_compliments, "total_sc":student_complains, "total_s":student_compliments, "total_mc":maintenance_complains, "total_m":maintenance_compliments})
+
+# end of count department feedbacks

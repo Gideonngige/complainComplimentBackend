@@ -14,5 +14,6 @@ urlpatterns = [
     path('notification/<str:email>/', views.notification, name='notification'),
     path('countreceivedresolved/', views.countreceivedresolved, name='countreceivedresolved'),
     path('getreport/', views.getreport, name='getreport'),
-     path('getuser/<str:email>/', views.getuser, name='getuser'),
+    path('getuser/<str:email>/', views.getuser, name='getuser'),
+     path('countdepartmentfeedbacks/', views.countdepartmentfeedbacks, name='countdepartmentfeedbacks'),
 ]
